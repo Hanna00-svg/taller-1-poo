@@ -2,13 +2,12 @@
 public class Carro: Vehiculo
 {
     public int Id {get;set;}   
-     public string Marca {get;set;} 
-     public string Color {get;set;} 
-      public string Placa {get;set;} 
-       public int Cilindraje {get;set;} 
-        public decimal Precio {get;set;} 
-
-        List<Carro> carros = new List<Carro>();
+    public string Marca {get;set;} 
+    public string Color {get;set;} 
+    public string Placa {get;set;} 
+    public int Cilindraje {get;set;} 
+    public decimal Precio {get;set;} 
+    
 
     public Carro(int id,string marca, string color,string placa,int cilindraje,decimal precio)
     {
