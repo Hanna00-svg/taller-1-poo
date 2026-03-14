@@ -3,7 +3,8 @@ using System.Data.Common;
 public class Almacen
 {
     public List<Vehiculo> vehiculos {get;set;}
-
+    //agregamos el atributo rutaArchivo
+    private string rutaArchivo = "vehiculos.csv";
     public Almacen(){
         
     }
@@ -35,6 +36,5 @@ public class Almacen
     }
 
    
-
-
+    
 }
