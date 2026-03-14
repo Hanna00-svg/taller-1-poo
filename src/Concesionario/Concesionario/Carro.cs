@@ -1,6 +1,6 @@
 public class Carro : Vehiculo
 {
-    public long Id {get;set;}   
+    public int Id {get;set;}   
     public string Marca {get;set;} 
     public string Modelo{get;set;}
     public string Color {get;set;} 
@@ -9,7 +9,7 @@ public class Carro : Vehiculo
     public decimal Precio {get;set;} 
     
 
-    public Carro(long id,string marca, string modelo,string color,string placa,int cilindraje,decimal precio): base (id,marca,modelo,color,placa,cilindraje,precio)
+    public Carro(int id,string marca, string modelo,string color,string placa,int cilindraje,decimal precio): base (id,marca,modelo,color,placa,cilindraje,precio)
     {
         Id = id;
         Marca = marca;
@@ -20,20 +20,19 @@ public class Carro : Vehiculo
         
     }
 
-   
     public override decimal CalcularPrecioFinal()
     {
         decimal iva = 0;
         if (Cilindraje >= 1400 && Cilindraje <= 2000)
         {
-             iva = 0.10m;
+            iva = 0.10m;
         }
         if (Cilindraje > 2000 && Cilindraje <= 2500)
         {
-             iva = 0.20m;
+            iva = 0.20m;
         }
 
         decimal Preciofinal = Precio + iva;
-       return Preciofinal;
+        return Preciofinal;
     }
 }
