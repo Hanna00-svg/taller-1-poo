@@ -1,6 +1,6 @@
 public class Moto : Vehiculo
 {
-     public long Id {get;set;}   
+     public int Id {get;set;}   
      public string Marca {get;set;} 
      public string Modelo{get;set;}
      public string Color {get;set;} 
@@ -9,7 +9,7 @@ public class Moto : Vehiculo
      public decimal Precio {get;set;} 
 
 
-     public Moto(long id,string marca,string modelo,string color,string placa,int cilindraje,decimal precio):base (id,marca,modelo,color,placa,cilindraje,precio)
+     public Moto(int id,string marca,string modelo,string color,string placa,int cilindraje,decimal precio):base (id,marca,modelo,color,placa,cilindraje,precio)
      {
           Id = id;
           Marca = marca;
