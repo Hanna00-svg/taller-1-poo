@@ -1,5 +1,4 @@
-
-public class Carro: Vehiculo
+public class Carro :Vehiculo
 {
     public int Id {get;set;}   
     public string Marca {get;set;} 
