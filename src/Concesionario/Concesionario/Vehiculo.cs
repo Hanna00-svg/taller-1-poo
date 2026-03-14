@@ -11,6 +11,8 @@ namespace Concesionario
         public string Color { get; set; }
         public string Placa { get; set; }
         public decimal Precio { get; set; }
+        public bool Vendido { get; set; }
+
 
 
         public Vehiculo(int id, string marca, string modelo, string color, string placa, decimal precio)
@@ -22,6 +24,12 @@ namespace Concesionario
             Placa = placa;
             Precio = precio;
         }
+
+        public void Vender()
+        {
+            Vendido = true;
+        }
+
 
         public abstract decimal CalcularPrecioFinal();
 
