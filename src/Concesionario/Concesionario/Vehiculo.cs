@@ -2,7 +2,7 @@ using System;
 public abstract class Vehiculo : IVendible , IPersistible
 
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
         public string Marca { get; set; }
         public string Modelo { get; set; }
         public string Color { get; set; }
@@ -11,7 +11,7 @@ public abstract class Vehiculo : IVendible , IPersistible
         public decimal Precio { get; set; }
         public bool Vendido { get; set; }
 
-        public Vehiculo(long id, string marca, string modelo, string color, string placa, int cilindraje, decimal precio)
+        public Vehiculo(int id, string marca, string modelo, string color, string placa, int cilindraje, decimal precio)
         {
             Id = id;
             Marca = marca;
