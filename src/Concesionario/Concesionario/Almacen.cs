@@ -54,35 +54,36 @@ public class Almacen
             writer.WriteLine(linea);
             }
         }
-
-        public void CargarVehiculos()
-{
-    // 1. Verificamos si el archivo existe para evitar que el programa falle
-    if (!File.Exists("vehiculos.csv"))
-    {
-        Console.WriteLine("No se encontró el archivo de datos.");
-        return;
     }
 
-    using (StreamReader reader = new StreamReader("vehiculos.csv"))
+        public void CargarVehiculos()   
     {
+        // 1. Verificamos si el archivo existe para evitar que el programa falle
+        if (!File.Exists("vehiculos.csv"))
+        {
+        Console.WriteLine("No se encontró el archivo de datos.");
+        return;
+        }
+
+        using (StreamReader reader = new StreamReader("vehiculos.csv"))
+        {
         // 2. Saltamos la primera línea (el encabezado)
         reader.ReadLine();
 
         // 3. Limpiamos la lista actual para no duplicar datos si cargamos varias veces
         vehiculos.Clear();
 
-        while (!reader.EndOfStream)
-        {
-            string linea = reader.ReadLine();
-            if (string.IsNullOrWhiteSpace(linea)) continue;
+            while (!reader.EndOfStream)
+            {
+                string linea = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(linea)) continue;
 
-            // 4. Separamos los datos por la coma
-            string[] datos = linea.Split(',');
+                // 4. Separamos los datos por la coma
+                string[] datos = linea.Split(',');
 
-            // 5. Convertimos los textos a sus tipos correspondientes (int, string, etc.)
-            // Creamos un objeto 'Carro' por defecto para llenar la lista de Vehiculos
-            Vehiculo v = new Carro(
+                // 5. Convertimos los textos a sus tipos correspondientes (int, string, etc.)
+                // Creamos un objeto 'Carro' por defecto para llenar la lista de Vehiculos
+                Vehiculo v = new Carro(
                 int.Parse(datos[0]), // Id
                 datos[1],            // Marca
                 datos[2],            // Modelo
@@ -95,12 +96,12 @@ public class Almacen
             // 6. Agregamos a la lista global
             vehiculos.Add(v);
         }
+        }
+        Console.WriteLine($"Se cargaron {vehiculos.Count} vehículos exitosamente.");
     }
-    Console.WriteLine($"Se cargaron {vehiculos.Count} vehículos exitosamente.");
-}
     
         
-    }
+    
 
    
     
