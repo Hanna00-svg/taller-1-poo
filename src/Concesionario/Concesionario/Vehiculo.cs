@@ -35,4 +35,3 @@ public abstract class Vehiculo : IVendible , IPersistible
         }
     }
 
-
