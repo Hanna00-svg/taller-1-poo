@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-
-
-    public abstract class Vehiculo : IVendible, IPersistible
-=======
 using System;
 public abstract class Vehiculo : IVendible , IPersistible
 
->>>>>>> 0bcc8d2029b6d594338de163c6b5828feac80a7a
     {
         public long Id { get; set; }
         public string Marca { get; set; }
@@ -41,7 +35,3 @@ public abstract class Vehiculo : IVendible , IPersistible
         }
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 0bcc8d2029b6d594338de163c6b5828feac80a7a

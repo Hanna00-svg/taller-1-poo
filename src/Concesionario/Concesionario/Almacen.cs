@@ -17,7 +17,7 @@ public class Almacen
 
     public void EliminarVehiculo(int id)
     {
-        Vehiculo vehiculoEliminar = vehiculos.Find(v => v.id = id);
+        Vehiculo vehiculoEliminar = vehiculos.Find(v => v.Id == id);
         if (vehiculoEliminar != null)
         {
             vehiculos.Remove(vehiculoEliminar);
