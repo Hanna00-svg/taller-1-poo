@@ -1,27 +1,31 @@
-using System.Data.Common;
 using System.Globalization;
 using CsvHelper;
+
 public class Almacen
 {
-    public List<Vehiculo> vehiculos {get;set;}
-   
-    private string rutaArchivo = "vehiculos.csv";
-    public Almacen(){
-        
+    public List<Vehiculo> Vehiculos { get; set; }
+    private readonly string _rutaArchivo = "vehiculos.csv";
+
+    public Almacen()
+    {
+        // Fix: inicializar la lista para evitar NullReferenceException
+        Vehiculos = new List<Vehiculo>();
+        CargarVehiculos();
     }
 
     public void AgregarVehiculo(Vehiculo vehiculo)
     {
-        
-        vehiculos.Add(vehiculo);
+        Vehiculos.Add(vehiculo);
+        GuardarVehiculos();
     }
 
     public void EliminarVehiculo(int id)
     {
-        Vehiculo vehiculoEliminar = vehiculos.Find(v => v.Id == id);
+        Vehiculo? vehiculoEliminar = Vehiculos.Find(v => v.Id == id);
         if (vehiculoEliminar != null)
         {
-            vehiculos.Remove(vehiculoEliminar);
+            Vehiculos.Remove(vehiculoEliminar);
+            GuardarVehiculos();
             Console.WriteLine($"Vehículo con ID {id} ha sido eliminado.");
         }
         else
@@ -30,53 +34,37 @@ public class Almacen
         }
     }
 
-    public bool ConsultarDisponibilida(int id)
+    public bool ConsultarDisponibilidad(int id)
     {
-      bool existe =  vehiculos.Any(v => v.Id == id);
-      return existe;
+        return Vehiculos.Any(v => v.Id == id && !v.Vendido);
     }
+
+    public Vehiculo? BuscarPorPlaca(string placa)
+    {
+        return Vehiculos.FirstOrDefault(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ── Persistencia con CSV manual (formato: Tipo,Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido) ──
 
    public void GuardarVehiculos()
     {
-        // Usamos CultureInfo.InvariantCulture para asegurar que los decimales 
-        // se guarden con punto (.) y no dependan del idioma del sistema.
-            using (var writer = new StreamWriter("vehiculos.csv"))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-            // Escribe toda la lista de un solo golpe, incluyendo el encabezado
-            csv.WriteRecords(vehiculos);
-            }
-    }
-
-       public void CargarVehiculos()
-    {
-        if (!File.Exists("vehiculos.csv"))
+        using (var writer = new StreamWriter("vehiculos.csv"))
+        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
         {
-            Console.WriteLine("No se encontró el archivo de datos.");
-            return;
+            csv.WriteRecords(Vehiculos);
         }
+    }
+    public void CargarVehiculos()
+    {
+        if (!File.Exists("vehiculos.csv")) return;
 
         using (var reader = new StreamReader("vehiculos.csv"))
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
-            // Limpiamos la lista para evitar duplicados
-            vehiculos.Clear();
-        
-            // CsvHelper mapea automáticamente las columnas a las propiedades de la clase Carro
-            // .ToList() ejecuta la lectura de todas las filas
+            Vehiculos.Clear();
+            // Leemos como Carro (o la clase que estés usando para el mapeo)
             var registros = csv.GetRecords<Carro>().ToList();
-        
-            foreach (var v in registros)
-            {
-                vehiculos.Add(v);
-            }
+            Vehiculos.AddRange(registros);
+        }
     }
-    
-    Console.WriteLine($"Se cargaron {vehiculos.Count} vehículos exitosamente.");
-}
-        
-    
-
-   
-    
 }
