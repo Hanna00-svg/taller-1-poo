@@ -3,7 +3,6 @@ using System.Data.Common;
 public class Almacen
 {
     public List<Vehiculo> vehiculos {get;set;}
-   
     private string rutaArchivo = "vehiculos.csv";
     public Almacen(){
         
@@ -31,8 +30,8 @@ public class Almacen
 
     public bool ConsultarDisponibilida(int id)
     {
-      bool existe =  vehiculos.Any(v => v.Id == id);
-      return existe;
+        bool existe =  vehiculos.Any(v => v.Id == id);
+        return existe;
     }
 
     public void GuardarVehiculos()
@@ -101,8 +100,5 @@ public class Almacen
     }
     
         
-    
-
-   
     
 }
