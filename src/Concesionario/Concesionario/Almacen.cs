@@ -46,7 +46,7 @@ public class Almacen
 
     // ── Persistencia con CSV manual (formato: Tipo,Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido) ──
 
-   public void GuardarVehiculos()
+    public void GuardarVehiculos()
     {
         using (var writer = new StreamWriter("vehiculos.csv"))
         using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
