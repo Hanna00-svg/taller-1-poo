@@ -3,7 +3,10 @@ namespace ConsoleApp;
 
 public static class UIAlmacen
 {
-    private static Almacen almacen = new Almacen();
+    // Instancia compartida del almacén (usada también por UIVentas)
+    private static Almacen _almacen = new Almacen();
+
+    public static Almacen GetAlmacen() => _almacen;
 
     public static void SubmenuAlmacen()
     {
@@ -21,9 +24,8 @@ public static class UIAlmacen
 
         do
         {
-
             Console.Write(menuAlmacen);
-            string entrada = Console.ReadLine();
+            string? entrada = Console.ReadLine();
 
             switch (entrada)
             {
@@ -37,6 +39,7 @@ public static class UIAlmacen
             }
 
             Console.WriteLine("\nPresione una tecla para continuar...");
+            Console.ReadKey();
 
         } while (true);
     }
@@ -44,50 +47,55 @@ public static class UIAlmacen
     static void AgregarVehiculo()
     {
         Console.WriteLine("=== AGREGAR VEHÍCULO AL ALMACÉN ===");
-        Console.Write("Id: "); int id = int.Parse(Console.ReadLine());
-        Console.Write("Marca: "); string marca = Console.ReadLine();
-        Console.Write("Modelo: "); string modelo = Console.ReadLine();
-        Console.Write("Color: "); string color = Console.ReadLine();
-        Console.Write("Placa: "); string placa = Console.ReadLine();
-        Console.Write("Cilindraje: "); int cilindraje = int.Parse(Console.ReadLine());
-        Console.Write("Precio: "); decimal precio = decimal.Parse(Console.ReadLine());
+        Console.WriteLine("1. Carro");
+        Console.WriteLine("2. Moto");
+        Console.Write("Seleccione tipo: "); string? tipo = Console.ReadLine();
 
-        Vehiculo v = new Carro(id, marca, modelo, color, placa, cilindraje, precio); 
+        Console.Write("Id: "); int id = int.Parse(Console.ReadLine()!);
+        Console.Write("Marca: "); string marca = Console.ReadLine()!;
+        Console.Write("Modelo: "); string modelo = Console.ReadLine()!;
+        Console.Write("Color: "); string color = Console.ReadLine()!;
+        Console.Write("Placa: "); string placa = Console.ReadLine()!;
+        Console.Write("Cilindraje: "); int cilindraje = int.Parse(Console.ReadLine()!);
+        Console.Write("Precio: "); decimal precio = decimal.Parse(Console.ReadLine()!);
 
-        almacen.AgregarVehiculo(v);
-        Console.WriteLine("Vehículo agregado al almacén con éxito.");
+        Vehiculo v = (tipo == "2")
+            ? new Moto(id, marca, modelo, color, placa, cilindraje, precio)
+            : new Carro(id, marca, modelo, color, placa, cilindraje, precio);
+
+        _almacen.AgregarVehiculo(v); // guarda automáticamente
+        Console.WriteLine($"Vehículo agregado al almacén con éxito. Precio final: {v.CalcularPrecioFinal():C}");
     }
 
     static void EliminarVehiculo()
     {
         Console.WriteLine("=== ELIMINAR VEHÍCULO DEL ALMACÉN ===");
-        Console.Write("Ingrese el Id: "); int id = int.Parse(Console.ReadLine());
-        almacen.EliminarVehiculo(id);
-        Console.WriteLine("Vehículo eliminado del almacén.");
+        Console.Write("Ingrese el Id: "); int id = int.Parse(Console.ReadLine()!);
+        _almacen.EliminarVehiculo(id); // guarda automáticamente
     }
 
     static void ConsultarDisponibilidad()
     {
         Console.WriteLine("=== CONSULTAR DISPONIBILIDAD ===");
-        Console.Write("Ingrese el Id: "); int id = int.Parse(Console.ReadLine());
-        bool disponible = almacen.ConsultarDisponibilidad(id);
-        Console.WriteLine(disponible ? "Vehículo disponible." : "Vehículo no disponible.");
+        Console.Write("Ingrese el Id: "); int id = int.Parse(Console.ReadLine()!);
+        bool disponible = _almacen.ConsultarDisponibilidad(id);
+        Console.WriteLine(disponible ? "Vehículo disponible." : "Vehículo no disponible o ya vendido.");
     }
 
     static void BuscarPorPlaca()
     {
         Console.WriteLine("=== BUSCAR VEHÍCULO POR PLACA ===");
-        Console.Write("Ingrese la placa: "); string placa = Console.ReadLine();
-        var v = almacen.BuscarPorPlaca(placa);
+        Console.Write("Ingrese la placa: "); string? placa = Console.ReadLine();
+        var v = _almacen.BuscarPorPlaca(placa!);
         if (v == null) Console.WriteLine("Vehículo no encontrado.");
-        else Console.WriteLine($"{v.Id} - {v.Marca} {v.Modelo} ({v.Placa}) Precio: {v.Precio}");
+        else Console.WriteLine($"{v.Id} - {v.Marca} {v.Modelo} ({v.Placa}) Precio final: {v.CalcularPrecioFinal():C} Vendido: {v.Vendido}");
     }
 
     static void ListarVehiculos()
     {
         Console.WriteLine("=== LISTA DE VEHÍCULOS EN ALMACÉN ===");
-        if (almacen.Vehiculos.Count == 0) { Console.WriteLine("No hay vehículos en el almacén."); return; }
-        foreach (var v in almacen.Vehiculos)
-            Console.WriteLine($"{v.Id} - {v.Marca} {v.Modelo} ({v.Placa}) Precio: {v.Precio} Vendido: {v.Vendido}");
+        if (_almacen.Vehiculos.Count == 0) { Console.WriteLine("No hay vehículos en el almacén."); return; }
+        foreach (var v in _almacen.Vehiculos)
+            Console.WriteLine($"[{v.Id}] {v.Marca} {v.Modelo} ({v.Placa}) | Precio final: {v.CalcularPrecioFinal():C} | Vendido: {v.Vendido}");
     }
 }
