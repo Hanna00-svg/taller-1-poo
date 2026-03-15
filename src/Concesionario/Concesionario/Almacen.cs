@@ -1,25 +1,28 @@
-using System.Data.Common;
-
 public class Almacen
 {
-    public List<Vehiculo> vehiculos {get;set;}
-    private string rutaArchivo = "vehiculos.csv";
-    public Almacen(){
-        
+    public List<Vehiculo> Vehiculos { get; set; }
+    private readonly string _rutaArchivo = "vehiculos.csv";
+
+    public Almacen()
+    {
+        // Fix: inicializar la lista para evitar NullReferenceException
+        Vehiculos = new List<Vehiculo>();
+        CargarVehiculos();
     }
 
     public void AgregarVehiculo(Vehiculo vehiculo)
     {
-        
-        vehiculos.Add(vehiculo);
+        Vehiculos.Add(vehiculo);
+        GuardarVehiculos();
     }
 
     public void EliminarVehiculo(int id)
     {
-        Vehiculo vehiculoEliminar = vehiculos.Find(v => v.Id == id);
+        Vehiculo? vehiculoEliminar = Vehiculos.Find(v => v.Id == id);
         if (vehiculoEliminar != null)
         {
-            vehiculos.Remove(vehiculoEliminar);
+            Vehiculos.Remove(vehiculoEliminar);
+            GuardarVehiculos();
             Console.WriteLine($"Vehículo con ID {id} ha sido eliminado.");
         }
         else
@@ -28,77 +31,62 @@ public class Almacen
         }
     }
 
-    public bool ConsultarDisponibilida(int id)
+    public bool ConsultarDisponibilidad(int id)
     {
-        bool existe =  vehiculos.Any(v => v.Id == id);
-        return existe;
+        return Vehiculos.Any(v => v.Id == id && !v.Vendido);
     }
+
+    public Vehiculo? BuscarPorPlaca(string placa)
+    {
+        return Vehiculos.FirstOrDefault(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ── Persistencia con CSV manual (formato: Tipo,Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido) ──
 
     public void GuardarVehiculos()
     {
-        using (StreamWriter writer = new StreamWriter("vehiculos.csv"))
-        {
-            // 1. Encabezado con los atributos comunes
-            writer.WriteLine("Id,Marca,Modelo,Color,Placa,Cilindraje,Precio");
-
-            // 2. Ciclo for para recorrer la lista
-            for (int i = 0; i < vehiculos.Count; i++)
-            {
-            Vehiculo v = vehiculos[i];
-            
-            // 3. Creamos la línea solo con las propiedades de la clase madre
-            string linea = $"{v.Id},{v.Marca},{v.Modelo},{v.Color},{v.Placa},{v.Cilindraje},{v.Precio}";
-            
-            // 4. Escribimos en el archivo
-            writer.WriteLine(linea);
-            }
-        }
+        using StreamWriter writer = new StreamWriter(_rutaArchivo, append: false);
+        writer.WriteLine("Tipo,Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido");
+        foreach (Vehiculo v in Vehiculos)
+            writer.WriteLine(v.ToCsv()); // usa el ToCsv() con discriminador de Carro/Moto
     }
 
-        public void CargarVehiculos()   
+    public void CargarVehiculos()
     {
-        // 1. Verificamos si el archivo existe para evitar que el programa falle
-        if (!File.Exists("vehiculos.csv"))
+        if (!File.Exists(_rutaArchivo))
+            return;
+
+        using StreamReader reader = new StreamReader(_rutaArchivo);
+        reader.ReadLine(); // saltar encabezado
+
+        Vehiculos.Clear();
+
+        while (!reader.EndOfStream)
         {
-        Console.WriteLine("No se encontró el archivo de datos.");
-        return;
+            string? linea = reader.ReadLine();
+            if (string.IsNullOrWhiteSpace(linea)) continue;
+
+            string[] d = linea.Split(',');
+            if (d.Length < 9) continue;
+
+            string tipo       = d[0];
+            int id            = int.Parse(d[1]);
+            string marca      = d[2];
+            string modelo     = d[3];
+            string color      = d[4];
+            string placa      = d[5];
+            int cilindraje    = int.Parse(d[6]);
+            decimal precio    = decimal.Parse(d[7], System.Globalization.CultureInfo.InvariantCulture);
+            bool vendido      = bool.Parse(d[8]);
+
+            Vehiculo v = tipo == "Moto"
+                ? new Moto(id, marca, modelo, color, placa, cilindraje, precio)
+                : new Carro(id, marca, modelo, color, placa, cilindraje, precio);
+
+            v.Vendido = vendido;
+            Vehiculos.Add(v);
         }
 
-        using (StreamReader reader = new StreamReader("vehiculos.csv"))
-        {
-        // 2. Saltamos la primera línea (el encabezado)
-        reader.ReadLine();
-
-        // 3. Limpiamos la lista actual para no duplicar datos si cargamos varias veces
-        vehiculos.Clear();
-
-            while (!reader.EndOfStream)
-            {
-                string linea = reader.ReadLine();
-                if (string.IsNullOrWhiteSpace(linea)) continue;
-
-                // 4. Separamos los datos por la coma
-                string[] datos = linea.Split(',');
-
-                // 5. Convertimos los textos a sus tipos correspondientes (int, string, etc.)
-                // Creamos un objeto 'Carro' por defecto para llenar la lista de Vehiculos
-                Vehiculo v = new Carro(
-                int.Parse(datos[0]), // Id
-                datos[1],            // Marca
-                datos[2],            // Modelo
-                datos[3],            // Color
-                datos[4],            // Placa
-                int.Parse(datos[5]),  // Cilindraje
-                decimal.Parse(datos[6])   //Precio
-            );
-
-            // 6. Agregamos a la lista global
-            vehiculos.Add(v);
-        }
-        }
-        Console.WriteLine($"Se cargaron {vehiculos.Count} vehículos exitosamente.");
+        Console.WriteLine($"Se cargaron {Vehiculos.Count} vehículos exitosamente.");
     }
-    
-        
-    
 }
