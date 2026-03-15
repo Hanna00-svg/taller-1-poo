@@ -1,5 +1,6 @@
 using System.Data.Common;
-
+using System.Globalization;
+using CsvHelper;
 public class Almacen
 {
     public List<Vehiculo> vehiculos {get;set;}
@@ -35,71 +36,44 @@ public class Almacen
       return existe;
     }
 
-    public void GuardarVehiculos()
+   public void GuardarVehiculos()
     {
-        using (StreamWriter writer = new StreamWriter("vehiculos.csv"))
-        {
-            // 1. Encabezado con los atributos comunes
-            writer.WriteLine("Id,Marca,Modelo,Color,Placa,Cilindraje,Precio");
-
-            // 2. Ciclo for para recorrer la lista
-            for (int i = 0; i < vehiculos.Count; i++)
+        // Usamos CultureInfo.InvariantCulture para asegurar que los decimales 
+        // se guarden con punto (.) y no dependan del idioma del sistema.
+            using (var writer = new StreamWriter("vehiculos.csv"))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-            Vehiculo v = vehiculos[i];
-            
-            // 3. Creamos la línea solo con las propiedades de la clase madre
-            string linea = $"{v.Id},{v.Marca},{v.Modelo},{v.Color},{v.Placa},{v.Cilindraje},{v.Precio}";
-            
-            // 4. Escribimos en el archivo
-            writer.WriteLine(linea);
+            // Escribe toda la lista de un solo golpe, incluyendo el encabezado
+            csv.WriteRecords(vehiculos);
             }
-        }
     }
 
-        public void CargarVehiculos()   
+       public void CargarVehiculos()
     {
-        // 1. Verificamos si el archivo existe para evitar que el programa falle
         if (!File.Exists("vehiculos.csv"))
         {
-        Console.WriteLine("No se encontró el archivo de datos.");
-        return;
+            Console.WriteLine("No se encontró el archivo de datos.");
+            return;
         }
 
-        using (StreamReader reader = new StreamReader("vehiculos.csv"))
+        using (var reader = new StreamReader("vehiculos.csv"))
+        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
-        // 2. Saltamos la primera línea (el encabezado)
-        reader.ReadLine();
-
-        // 3. Limpiamos la lista actual para no duplicar datos si cargamos varias veces
-        vehiculos.Clear();
-
-            while (!reader.EndOfStream)
+            // Limpiamos la lista para evitar duplicados
+            vehiculos.Clear();
+        
+            // CsvHelper mapea automáticamente las columnas a las propiedades de la clase Carro
+            // .ToList() ejecuta la lectura de todas las filas
+            var registros = csv.GetRecords<Carro>().ToList();
+        
+            foreach (var v in registros)
             {
-                string linea = reader.ReadLine();
-                if (string.IsNullOrWhiteSpace(linea)) continue;
-
-                // 4. Separamos los datos por la coma
-                string[] datos = linea.Split(',');
-
-                // 5. Convertimos los textos a sus tipos correspondientes (int, string, etc.)
-                // Creamos un objeto 'Carro' por defecto para llenar la lista de Vehiculos
-                Vehiculo v = new Carro(
-                int.Parse(datos[0]), // Id
-                datos[1],            // Marca
-                datos[2],            // Modelo
-                datos[3],            // Color
-                datos[4],            // Placa
-                int.Parse(datos[5]),  // Cilindraje
-                decimal.Parse(datos[6])   //Precio
-            );
-
-            // 6. Agregamos a la lista global
-            vehiculos.Add(v);
-        }
-        }
-        Console.WriteLine($"Se cargaron {vehiculos.Count} vehículos exitosamente.");
+                vehiculos.Add(v);
+            }
     }
     
+    Console.WriteLine($"Se cargaron {vehiculos.Count} vehículos exitosamente.");
+}
         
     
 
