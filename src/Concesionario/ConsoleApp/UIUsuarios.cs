@@ -42,6 +42,11 @@ public static class UIUsuarios
 
         _clientes.Add(new Cliente { Cedula = cedula, Nombre = nombre, Telefono = telefono, Direccion = direccion });
         Cliente.GuardarClientes(_clientes);
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void ListarClientes()
@@ -49,6 +54,11 @@ public static class UIUsuarios
         if (_clientes.Count == 0) { Console.WriteLine("No hay clientes."); return; }
         foreach (var c in _clientes)
             Console.WriteLine($"{c.Cedula} - {c.Nombre} | Tel: {c.Telefono} | Dir: {c.Direccion}");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void ActualizarCliente()
@@ -61,6 +71,11 @@ public static class UIUsuarios
         Console.Write("Nuevo teléfono: "); cliente.Telefono = Console.ReadLine()!;
         Console.Write("Nueva dirección: "); cliente.Direccion = Console.ReadLine()!;
         Cliente.GuardarClientes(_clientes);
+        Console.WriteLine("""
+        
+        ================================================================================
+        
+        """);
     }
 
     static void EliminarCliente()
@@ -70,5 +85,10 @@ public static class UIUsuarios
         if (cliente == null) { Console.WriteLine("No encontrado."); return; }
         _clientes.Remove(cliente);
         Cliente.GuardarClientes(_clientes);
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 }

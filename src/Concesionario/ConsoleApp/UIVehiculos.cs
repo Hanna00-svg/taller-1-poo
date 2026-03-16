@@ -60,6 +60,11 @@ public static class UIVehiculos
 
         vehiculos.Add(v);
         Console.WriteLine("\nVehículo registrado con éxito.");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void ListarVehiculos()
@@ -68,6 +73,11 @@ public static class UIVehiculos
         if (vehiculos.Count == 0) { Console.WriteLine("No hay vehículos registrados."); return; }
         foreach (var v in vehiculos)
             Console.WriteLine($"{v.Id} - {v.Marca} {v.Modelo} ({v.Placa}) Precio: {v.Precio} Vendido: {v.Vendido}");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void ActualizarVehiculo()
@@ -85,6 +95,11 @@ public static class UIVehiculos
         Console.Write("Nuevo precio: "); vehiculo.Precio = decimal.Parse(Console.ReadLine());
 
         Console.WriteLine("Vehículo actualizado con éxito.");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void EliminarVehiculo()
@@ -95,5 +110,10 @@ public static class UIVehiculos
         if (vehiculo == null) { Console.WriteLine("Vehículo no encontrado."); return; }
         vehiculos.Remove(vehiculo);
         Console.WriteLine("Vehículo eliminado con éxito.");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 }

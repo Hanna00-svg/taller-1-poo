@@ -40,7 +40,7 @@ public class Almacen
         return Vehiculos.Any(v => v.Id == id && !v.Vendido);
     }
 
-    public Vehiculo? BuscarPorPlaca(string placa)
+    public Vehiculo BuscarPorPlaca(string placa)
     {
         return Vehiculos.FirstOrDefault(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
     }
@@ -57,26 +57,26 @@ public class Almacen
     };
 
     public void GuardarVehiculos()
-{
-    using (var writer = new StreamWriter(_rutaArchivo))
-    // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
-    using (var csv = new CsvWriter(writer, Config)) 
+    {
+        using (var writer = new StreamWriter(_rutaArchivo))
+        // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
+        using (var csv = new CsvWriter(writer, Config)) 
     {
         csv.WriteRecords(Vehiculos);
     }
-}
-    public void CargarVehiculos()
-{
-    if (!File.Exists(_rutaArchivo)) return;
-
-    using (var reader = new StreamReader(_rutaArchivo))
-    // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
-    using (var csv = new CsvReader(reader, Config)) 
-    {
-        Vehiculos.Clear();
-        // Cargamos como Carro (esto funcionará para ambos si tienen los mismos campos)
-        var registros = csv.GetRecords<Carro>().Cast<Vehiculo>().ToList();
-        Vehiculos.AddRange(registros);
     }
-}
+    public void CargarVehiculos()
+    {
+        if (!File.Exists(_rutaArchivo)) return;
+
+        using (var reader = new StreamReader(_rutaArchivo))
+        // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
+        using (var csv = new CsvReader(reader, Config)) 
+        {
+            Vehiculos.Clear();
+            // Cargamos como Carro (esto funcionará para ambos si tienen los mismos campos)
+            var registros = csv.GetRecords<Carro>().Cast<Vehiculo>().ToList();
+            Vehiculos.AddRange(registros);
+        }
+    }
 }

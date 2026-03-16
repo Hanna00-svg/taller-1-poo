@@ -65,6 +65,11 @@ public static class UIAlmacen
 
         _almacen.AgregarVehiculo(v); // guarda automáticamente
         Console.WriteLine($"Vehículo agregado al almacén con éxito. Precio final: {v.CalcularPrecioFinal():C}");
+        Console.WriteLine("""
+
+        ================================================================================
+
+        """);
     }
 
     static void EliminarVehiculo()
@@ -72,6 +77,11 @@ public static class UIAlmacen
         Console.WriteLine("=== ELIMINAR VEHÍCULO DEL ALMACÉN ===");
         Console.Write("Ingrese el Id: "); int id = int.Parse(Console.ReadLine()!);
         _almacen.EliminarVehiculo(id); // guarda automáticamente
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void ConsultarDisponibilidad()
@@ -80,6 +90,11 @@ public static class UIAlmacen
         Console.Write("Ingrese el Id: "); int id = int.Parse(Console.ReadLine()!);
         bool disponible = _almacen.ConsultarDisponibilidad(id);
         Console.WriteLine(disponible ? "Vehículo disponible." : "Vehículo no disponible o ya vendido.");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 
     static void BuscarPorPlaca()
@@ -89,6 +104,11 @@ public static class UIAlmacen
         var v = _almacen.BuscarPorPlaca(placa!);
         if (v == null) Console.WriteLine("Vehículo no encontrado.");
         else Console.WriteLine($"{v.Id} - {v.Marca} {v.Modelo} ({v.Placa}) Precio final: {v.CalcularPrecioFinal():C} Vendido: {v.Vendido}");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);    
     }
 
     static void ListarVehiculos()
@@ -97,5 +117,10 @@ public static class UIAlmacen
         if (_almacen.Vehiculos.Count == 0) { Console.WriteLine("No hay vehículos en el almacén."); return; }
         foreach (var v in _almacen.Vehiculos)
             Console.WriteLine($"[{v.Id}] {v.Marca} {v.Modelo} ({v.Placa}) | Precio final: {v.CalcularPrecioFinal():C} | Vendido: {v.Vendido}");
+        Console.WriteLine("""
+
+        ================================================================================
+        
+        """);
     }
 }

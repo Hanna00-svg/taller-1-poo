@@ -8,9 +8,10 @@ public class Venta
     public DateTime Fecha { get; set; }
     public Cliente Cliente { get; set; }
     public List<Vehiculo> Vehiculos { get; set; }
-    public Factura Factura { get; set; }
+    public Factura? Factura { get; set; }
 
-    private static readonly string _rutaArchivo = "ventas.csv";
+    private static readonly string _rutaArchivo = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ventas.csv");
+
     private static CsvConfiguration Config => new CsvConfiguration(CultureInfo.InvariantCulture)
     {
         PrepareHeaderForMatch = args => args.Header.ToLower(),
@@ -21,7 +22,7 @@ public class Venta
     public void GenerarFactura()
     {
         decimal total = Vehiculos.Sum(v => v.CalcularPrecioFinal());
-        foreach (var v in Vehiculos) v.Vender();
+        foreach (var v in Vehiculos) v.Vendido = true;
         Factura = new Factura(Id, Fecha, Cliente, Vehiculos, total);
     }
 
