@@ -1,103 +1,82 @@
-using System.Data.Common;
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 public class Almacen
+{
+    public List<Vehiculo> Vehiculos { get; set; }
+    private readonly string _rutaArchivo = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vehiculos.csv");
+
+    public Almacen()
     {
-        public List<Vehiculo> Vehiculos { get; set; }
-        private string rutaArchivo = "vehiculos.csv";
+        // Fix: inicializar la lista para evitar NullReferenceException
+        Vehiculos = new List<Vehiculo>();
+        CargarVehiculos();
+    }
 
-        public Almacen()
+    public void AgregarVehiculo(Vehiculo vehiculo)
+    {
+        Vehiculos.Add(vehiculo);
+        GuardarVehiculos();
+    }
+
+    public void EliminarVehiculo(int id)
+    {
+        Vehiculo? vehiculoEliminar = Vehiculos.Find(v => v.Id == id);
+        if (vehiculoEliminar != null)
         {
-            Vehiculos = new List<Vehiculo>();
+            Vehiculos.Remove(vehiculoEliminar);
+            GuardarVehiculos();
+            Console.WriteLine($"Vehículo con ID {id} ha sido eliminado.");
         }
-
-        // Agregar vehículo
-        public void AgregarVehiculo(Vehiculo vehiculo)
+        else
         {
-            Vehiculos.Add(vehiculo);
-        }
-
-        // Eliminar vehículo por Id
-        public void EliminarVehiculo(long id)
-        {
-            Vehiculo vehiculoEliminar = Vehiculos.Find(v => v.Id == id);
-            if (vehiculoEliminar != null)
-            {
-                Vehiculos.Remove(vehiculoEliminar);
-                Console.WriteLine($"Vehículo con ID {id} ha sido eliminado.");
-            }
-            else
-            {
-                Console.WriteLine($"No se encontró ningún vehículo con el ID {id}.");
-            }
-        }
-
-        // Consultar disponibilidad por Id
-        public bool ConsultarDisponibilidad(long id)
-        {
-            return Vehiculos.Any(v => v.Id == id);
-        }
-
-        // Buscar vehículo por placa
-        public Vehiculo BuscarPorPlaca(string placa)
-        {
-            return Vehiculos.FirstOrDefault(v => v.Placa == placa);
-        }
-
-        // Guardar vehículos en archivo CSV usando IPersistible
-        public void GuardarVehiculos()
-        {
-            using (StreamWriter writer = new StreamWriter(rutaArchivo))
-            {
-                writer.WriteLine("Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido,Tipo");
-
-                foreach (var v in Vehiculos)
-                {
-                    writer.WriteLine(v.ToCsv()); // 👈 delega en la interfaz
-                }
-            }
-            Console.WriteLine("Vehículos guardados en archivo CSV.");
-        }
-
-        // Cargar vehículos desde archivo CSV
-        public void CargarVehiculos()
-        {
-            if (!File.Exists(rutaArchivo))
-            {
-                Console.WriteLine("No se encontró el archivo de datos.");
-                return;
-            }
-
-            using (StreamReader reader = new StreamReader(rutaArchivo))
-            {
-                reader.ReadLine(); // saltar encabezado
-                Vehiculos.Clear();
-
-                while (!reader.EndOfStream)
-                {
-                    string linea = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(linea)) continue;
-
-                    string[] datos = linea.Split(',');
-
-                    int id = int.Parse(datos[0]);
-                    string marca = datos[1];
-                    string modelo = datos[2];
-                    string color = datos[3];
-                    string placa = datos[4];
-                    int cilindraje = int.Parse(datos[5]);
-                    decimal precio = decimal.Parse(datos[6]);
-                    bool vendido = bool.Parse(datos[7]);
-                    string tipo = datos[8];
-
-                    Vehiculo v = tipo == "Carro"
-                        ? new Carro(id, marca, modelo, color, placa, cilindraje, precio)
-                        : new Moto(id, marca, modelo, color, placa, cilindraje, precio);
-
-                    if (vendido) v.Vender();
-                    Vehiculos.Add(v);
-                }
-            }
-
-            Console.WriteLine($"Se cargaron {Vehiculos.Count} vehículos exitosamente.");
+            Console.WriteLine($"No se encontró ningún vehículo con el ID {id}.");
         }
     }
+
+    public bool ConsultarDisponibilidad(int id)
+    {
+        return Vehiculos.Any(v => v.Id == id && !v.Vendido);
+    }
+
+    public Vehiculo? BuscarPorPlaca(string placa)
+    {
+        return Vehiculos.FirstOrDefault(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
+    }
+
+    
+    // ── Persistencia con CSV manual (formato: Tipo,Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido) ──
+
+    private CsvConfiguration Config => new CsvConfiguration(CultureInfo.InvariantCulture)
+    {
+        // Convierte todo a minúsculas antes de comparar, así 'Id' coincide con 'id'
+        PrepareHeaderForMatch = args => args.Header.ToLower(),
+        HeaderValidated = null, // Evita errores si falta alguna columna
+        MissingFieldFound = null // Evita errores si hay campos vacíos
+    };
+
+    public void GuardarVehiculos()
+{
+    using (var writer = new StreamWriter(_rutaArchivo))
+    // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
+    using (var csv = new CsvWriter(writer, Config)) 
+    {
+        csv.WriteRecords(Vehiculos);
+    }
+}
+    public void CargarVehiculos()
+{
+    if (!File.Exists(_rutaArchivo)) return;
+
+    using (var reader = new StreamReader(_rutaArchivo))
+    // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
+    using (var csv = new CsvReader(reader, Config)) 
+    {
+        Vehiculos.Clear();
+        // Cargamos como Carro (esto funcionará para ambos si tienen los mismos campos)
+        var registros = csv.GetRecords<Carro>().Cast<Vehiculo>().ToList();
+        Vehiculos.AddRange(registros);
+    }
+}
+}

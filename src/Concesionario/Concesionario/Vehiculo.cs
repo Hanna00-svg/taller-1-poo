@@ -1,4 +1,4 @@
-using System;
+
 public abstract class Vehiculo : IVendible , IPersistible
 
     {

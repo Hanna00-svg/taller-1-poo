@@ -1,4 +1,7 @@
 ﻿
+
+using ConsoleApp;
+
 string menu = """
  _______  _______  _        _______  _______  _______ _________ _______  _        _______  _______ _________ _______ 
 (  ____ \(  ___  )( (    /|(  ____ \(  ____ \(  ____ \\__   __/(  ___  )( (    /|(  ___  )(  ____ )\__   __/(  ___  )
@@ -17,7 +20,7 @@ string menu = """
             5. Salir
 -----------------------------------------------------------------------------------------------------------------------
             Ingrese una opción: 
-            """;
+""";
 
             do
             {
@@ -27,19 +30,19 @@ string menu = """
                 switch (entrada)
                 {
                     case "1":
-                        SubmenuClientes();
+                        UIUsuarios.SubmenuClientes();
                         break;
 
                     case "2":
-                        SubmenuVehiculos();
+                        UIVehiculos.SubmenuVehiculos();
                         break;
 
                     case "3":
-                        SubmenuVentas();
+                        UIVentas.SubmenuVentas();
                         break;
 
                     case "4":
-                        SubmenuAlmacen();
+                        UIAlmacen.SubmenuAlmacen();
                         break;
 
                     case "5":
@@ -52,6 +55,5 @@ string menu = """
                 }
 
                 Console.WriteLine("\nPresione una tecla para continuar...");
-                Console.ReadKey();
 
             } while (true);
