@@ -1,13 +1,15 @@
-
 namespace ConsoleApp;
 
 public static class UIVentas
 {
-    private static List<Venta> _ventas = Venta.CargarVentas(UIUsuarios.GetClientes(), UIAlmacen.GetAlmacen());
+    private static readonly string rutaVentas = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ventas.csv");
+    private static readonly PersistenciaCsv<Venta> persistencia = new PersistenciaCsv<Venta>();
+    private static List<Venta> _ventas = persistencia.Cargar(rutaVentas);
 
     public static void SubmenuVentas()
     {
         string menu = """
+        === SUBMENÚ VENTAS ===
         1. Crear Venta
         2. Listar Ventas
         3. Consultar Factura
@@ -33,118 +35,57 @@ public static class UIVentas
 
     static void CrearVenta()
     {
-        Console.Write("Id de venta: "); int id = int.Parse(Console.ReadLine()!);
-        Console.Write("Cédula cliente: "); int cedula = int.Parse(Console.ReadLine()!);
+        Console.Write("Id Venta: "); int id = int.Parse(Console.ReadLine()!);
+        Console.Write("Cédula Cliente: "); int cedula = int.Parse(Console.ReadLine()!);
 
         var cliente = UIUsuarios.GetClientes().FirstOrDefault(c => c.Cedula == cedula);
         if (cliente == null) { Console.WriteLine("Cliente no encontrado."); return; }
 
-        var almacen = UIAlmacen.GetAlmacen();
-        var disponibles = almacen.Vehiculos.Where(v => !v.Vendido).ToList();
-        if (disponibles.Count == 0) { Console.WriteLine("No hay vehículos disponibles."); return; }
+        Console.Write("Id Vehículo: "); int idVehiculo = int.Parse(Console.ReadLine()!);
+        var vehiculo = UIVehiculos.GetVehiculos().FirstOrDefault(v => v.Id == idVehiculo && !v.Vendido);
+        if (vehiculo == null) { Console.WriteLine("Vehículo no disponible."); return; }
 
-        Console.WriteLine("Vehículos disponibles:");
-        foreach (var v in disponibles)
-            Console.WriteLine($"[{v.Id}] {v.Marca} {v.Modelo} - {v.Placa}");
-
-        Console.Write("Ids seleccionados (coma): ");
-        var ids = Console.ReadLine()!.Split(',').Select(int.Parse).ToList();
-        var vehiculos = disponibles.Where(v => ids.Contains(v.Id)).ToList();
-
-        var venta = new Venta { Id = id, Cliente = cliente, Vehiculos = vehiculos, Fecha = DateTime.Now };
+        var venta = new Venta { Id = id, Fecha = DateTime.Now, Cliente = cliente, Vehiculos = new List<Vehiculo> { vehiculo } };
         venta.GenerarFactura();
         _ventas.Add(venta);
+        persistencia.Guardar(_ventas, rutaVentas);
 
-        Venta.GuardarVentas(_ventas);
-        almacen.GuardarVehiculos();
-
-        Console.WriteLine("""
-
-        ================================================================================
-        
-        """);
+        Console.WriteLine($"Venta creada. Total: {venta.Factura?.Total}");
     }
 
     static void ListarVentas()
     {
-        Console.WriteLine("=== LISTA DE VENTAS ===");
-        if (_ventas.Count == 0)
-        {
-            Console.WriteLine("No hay ventas registradas.");
-            return;
-        }
-
+        if (_ventas.Count == 0) { Console.WriteLine("No hay ventas."); return; }
         foreach (var v in _ventas)
-        {
-            Console.WriteLine($"Venta #{v.Id} | Fecha: {v.Fecha:d} | Cliente: {v.Cliente.Nombre} | Total: {v.Factura?.Total:C}");
-        }
-
-        Console.WriteLine("""
-
-        ================================================================================
-        
-        """);
+            Console.WriteLine($"Venta {v.Id} - Cliente: {v.Cliente.Nombre} - Total: {v.Factura?.Total}");
     }
 
     static void ConsultarFactura()
     {
-        Console.WriteLine("=== CONSULTAR FACTURA ===");
-        Console.Write("Ingrese Id de la venta: ");
-        if (!int.TryParse(Console.ReadLine(), out int id))
-        {
-            Console.WriteLine("Id inválido.");
-            return;
-        }
-
+        Console.Write("Id Venta: "); int id = int.Parse(Console.ReadLine()!);
         var venta = _ventas.FirstOrDefault(v => v.Id == id);
-        if (venta == null)
-        {
-            Console.WriteLine("Venta no encontrada.");
-            return;
-        }
+        if (venta == null) { Console.WriteLine("Venta no encontrada."); return; }
 
-        var factura = venta.Factura;
-        if (factura == null)
-        {
-            Console.WriteLine("La venta no tiene factura generada.");
-            return;
-        }
-
-        Console.WriteLine($"\nFactura #{factura.Id} - Fecha: {factura.Fecha:d}");
-        Console.WriteLine($"Cliente: {factura.Cliente.Nombre} (Cédula: {factura.Cliente.Cedula})");
-        Console.WriteLine($"Total: {factura.Total:C}");
+        Console.WriteLine($"Factura {venta.Factura?.Id} - Fecha: {venta.Fecha}");
+        Console.WriteLine($"Cliente: {venta.Cliente.Nombre}");
         Console.WriteLine("Vehículos:");
-        foreach (var v in factura.Vehiculos)
-            Console.WriteLine($"  - {v.Marca} {v.Modelo} ({v.Placa}) - Precio final: {v.CalcularPrecioFinal():C}");
+        foreach (var v in venta.Vehiculos)
+            Console.WriteLine($"   {v.Marca} {v.Modelo} - Placa: {v.Placa} - Precio Final: {v.CalcularPrecioFinal()}");
+        Console.WriteLine($"Total: {venta.Factura?.Total}");
     }
-
+    
     static void EliminarVenta()
     {
-        Console.WriteLine("=== ELIMINAR VENTA ===");
-        Console.Write("Ingrese Id de la venta: ");
-        if (!int.TryParse(Console.ReadLine(), out int id))
-        {
-            Console.WriteLine("Id inválido.");
-            return;
-        }
-
+        Console.Write("Id Venta: "); int id = int.Parse(Console.ReadLine()!);
         var venta = _ventas.FirstOrDefault(v => v.Id == id);
-        if (venta == null)
-        {
-            Console.WriteLine("Venta no encontrada.");
-            return;
-        }
-
+        if (venta == null) { Console.WriteLine("Venta no encontrada."); return; }
         _ventas.Remove(venta);
-        Venta.GuardarVentas(_ventas);   // persistencia
-        Console.WriteLine("Venta eliminada con éxito.");
-        Console.WriteLine("""
-
-        ================================================================================
-        
-        """);
+        persistencia.Guardar(_ventas, rutaVentas);
+        Console.WriteLine("Venta eliminada.");
     }
 
-
+    // Método auxiliar
+    public static List<Venta> GetVentas() => _ventas;
 }
+
 

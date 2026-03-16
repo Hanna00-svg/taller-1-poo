@@ -6,8 +6,6 @@ public class Factura
     public List<Vehiculo> Vehiculos { get; set; }
     public decimal Total { get; set; }
 
-    public Factura() { }
-
     public Factura(int id, DateTime fecha, Cliente cliente, List<Vehiculo> vehiculos, decimal total)
     {
         Id = id;
@@ -15,10 +13,5 @@ public class Factura
         Cliente = cliente;
         Vehiculos = vehiculos;
         Total = total;
-    }
-
-    public override string ToString()
-    {
-        return $"Factura #{Id} - Fecha: {Fecha:d} - Cliente: {Cliente.Nombre} - Total: {Total:C}";
     }
 }

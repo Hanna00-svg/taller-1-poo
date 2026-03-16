@@ -3,13 +3,13 @@ namespace ConsoleApp;
 
 public static class UIUsuarios
 {
-    private static List<Cliente> _clientes = Cliente.CargarClientes();
-
-    public static List<Cliente> GetClientes() => _clientes;
-
+    private static readonly string rutaClientes = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clientes.csv");
+    private static readonly PersistenciaCsv<Cliente> persistencia = new PersistenciaCsv<Cliente>();
+    private static List<Cliente> _clientes = persistencia.Cargar(rutaClientes);
     public static void SubmenuClientes()
     {
         string menu = """
+        === SUBMENÚ CLIENTES ===
         1. Crear Cliente
         2. Listar Clientes
         3. Actualizar Cliente
@@ -41,12 +41,7 @@ public static class UIUsuarios
         Console.Write("Dirección: "); string direccion = Console.ReadLine()!;
 
         _clientes.Add(new Cliente { Cedula = cedula, Nombre = nombre, Telefono = telefono, Direccion = direccion });
-        Cliente.GuardarClientes(_clientes);
-        Console.WriteLine("""
-
-        ================================================================================
-        
-        """);
+        persistencia.Guardar(_clientes, rutaClientes);
     }
 
     static void ListarClientes()
@@ -54,11 +49,6 @@ public static class UIUsuarios
         if (_clientes.Count == 0) { Console.WriteLine("No hay clientes."); return; }
         foreach (var c in _clientes)
             Console.WriteLine($"{c.Cedula} - {c.Nombre} | Tel: {c.Telefono} | Dir: {c.Direccion}");
-        Console.WriteLine("""
-
-        ================================================================================
-        
-        """);
     }
 
     static void ActualizarCliente()
@@ -70,12 +60,7 @@ public static class UIUsuarios
         Console.Write("Nuevo nombre: "); cliente.Nombre = Console.ReadLine()!;
         Console.Write("Nuevo teléfono: "); cliente.Telefono = Console.ReadLine()!;
         Console.Write("Nueva dirección: "); cliente.Direccion = Console.ReadLine()!;
-        Cliente.GuardarClientes(_clientes);
-        Console.WriteLine("""
-        
-        ================================================================================
-        
-        """);
+        persistencia.Guardar(_clientes, rutaClientes);
     }
 
     static void EliminarCliente()
@@ -84,11 +69,9 @@ public static class UIUsuarios
         var cliente = _clientes.FirstOrDefault(c => c.Cedula == cedula);
         if (cliente == null) { Console.WriteLine("No encontrado."); return; }
         _clientes.Remove(cliente);
-        Cliente.GuardarClientes(_clientes);
-        Console.WriteLine("""
-
-        ================================================================================
-        
-        """);
+        persistencia.Guardar(_clientes, rutaClientes);
     }
+
+    public static List<Cliente> GetClientes() => _clientes;
+
 }
