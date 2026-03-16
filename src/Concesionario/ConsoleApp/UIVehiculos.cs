@@ -5,7 +5,7 @@ public static class UIVehiculos
 {
     private static List<Vehiculo> vehiculos = new List<Vehiculo>();
 
-    static void SubmenuVehiculos()
+    public static void SubmenuVehiculos()
     {
         string menuVehiculos = """
         -------------------------------

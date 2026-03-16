@@ -1,57 +1,59 @@
+﻿
+
 using ConsoleApp;
 
-string menu =
-" _______  _______  _        _______  _______  _______ _________ _______  _        _______  _______ _________ _______ \n" +
-"(  ____ \\(  ___  )( (    /|(  ____ \\(  ____ \\(  ____ \\\\__   __/(  ___  )( (    /|(  ___  )(  ____ )\\__   __/(  ___  )\n" +
-"| (    \\/| (   ) ||  \\  ( || (    \\/| (    \\/| (    \\/   ) (   | (   ) ||  \\  ( || (   ) || (    )|   ) (   | (   ) |\n" +
-"| |      | |   | ||   \\ | || |      | (__    | (_____    | |   | |   | ||   \\ | || (___) || (____)|   | |   | |   | |\n" +
-"| |      | |   | || (\\ \\) || |      |  __)   (_____  )   | |   | |   | || (\\ \\) ||  ___  ||     __)   | |   | |   | |\n" +
-"| |      | |   | || | \\   || |      | (            ) |   | |   | |   | || | \\   || (   ) || (\\ (      | |   | |   | |\n" +
-"| (____/\\| (___) || )  \\  || (____/\\| (____/\\/\\____) |___) (___| (___) || )  \\  || )   ( || ) \\ \\_____) (___| (___) |\n" +
-"(_______/(_______)|/    )_)(_______/(_______/\\_______)\\_______/(_______)|/    )_)|/     \\||/   \\__/\\_______/(_______)\n" +
-"\n" +
-"-----------------------------------------------------------------------------------------------------------------------\n" +
-"            1. Registrar Cliente\n" +
-"            2. Registrar Vehículo (Almacén)\n" +
-"            3. Registrar Venta\n" +
-"            4. Consultar Almacén\n" +
-"            5. Salir\n" +
-"-----------------------------------------------------------------------------------------------------------------------\n" +
-"            Ingrese una opción: ";
+string menu = """
+ _______  _______  _        _______  _______  _______ _________ _______  _        _______  _______ _________ _______ 
+(  ____ \(  ___  )( (    /|(  ____ \(  ____ \(  ____ \\__   __/(  ___  )( (    /|(  ___  )(  ____ )\__   __/(  ___  )
+| (    \/| (   ) ||  \  ( || (    \/| (    \/| (    \/   ) (   | (   ) ||  \  ( || (   ) || (    )|   ) (   | (   ) |
+| |      | |   | ||   \ | || |      | (__    | (_____    | |   | |   | ||   \ | || (___) || (____)|   | |   | |   | |
+| |      | |   | || (\ \) || |      |  __)   (_____  )   | |   | |   | || (\ \) ||  ___  ||     __)   | |   | |   | |
+| |      | |   | || | \   || |      | (            ) |   | |   | |   | || | \   || (   ) || (\ (      | |   | |   | |
+| (____/\| (___) || )  \  || (____/\| (____/\/\____) |___) (___| (___) || )  \  || )   ( || ) \ \_____) (___| (___) |
+(_______/(_______)|/    )_)(_______/(_______/\_______)\_______/(_______)|/    )_)|/     \||/   \__/\_______/(_______)
 
-do
-{
-    Console.Write(menu);
-    string? entrada = Console.ReadLine();
+-----------------------------------------------------------------------------------------------------------------------
+            1. Registrar Cliente
+            2. Registrar Vehículo
+            3. Registrar Venta
+            4. Consultar Almacén
+            5. Salir
+-----------------------------------------------------------------------------------------------------------------------
+            Ingrese una opción: 
+""";
 
-    switch (entrada)
-    {
-        case "1":
-            UIUsuarios.SubmenuClientes();
-            break;
+            do
+            {
+                Console.Write(menu);
+                string entrada = Console.ReadLine();
 
-        case "2":
-            UIAlmacen.SubmenuAlmacen();
-            break;
+                switch (entrada)
+                {
+                    case "1":
+                        UIUsuarios.SubmenuClientes();
+                        break;
 
-        case "3":
-            UIVentas.SubmenuVentas();
-            break;
+                    case "2":
+                        UIVehiculos.SubmenuVehiculos();
+                        break;
 
-        case "4":
-            UIAlmacen.SubmenuAlmacen();
-            break;
+                    case "3":
+                        UIVentas.SubmenuVentas();
+                        break;
 
-        case "5":
-            Console.WriteLine("Saliendo del sistema...");
-            return;
+                    case "4":
+                        UIAlmacen.SubmenuAlmacen();
+                        break;
 
-        default:
-            Console.WriteLine("Opción inválida. Intente de nuevo.");
-            break;
-    }
+                    case "5":
+                        Console.WriteLine("Saliendo del sistema...");
+                        return;
 
-    Console.WriteLine("\nPresione una tecla para continuar...");
-    Console.ReadKey();
+                    default:
+                        Console.WriteLine("Opción inválida. Intente de nuevo.");
+                        break;
+                }
 
-} while (true);
+                Console.WriteLine("\nPresione una tecla para continuar...");
+
+            } while (true);
