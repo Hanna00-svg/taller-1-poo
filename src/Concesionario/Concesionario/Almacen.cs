@@ -1,5 +1,6 @@
 using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
 
 public class Almacen
 {
@@ -44,27 +45,38 @@ public class Almacen
         return Vehiculos.FirstOrDefault(v => v.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase));
     }
 
+    
     // ── Persistencia con CSV manual (formato: Tipo,Id,Marca,Modelo,Color,Placa,Cilindraje,Precio,Vendido) ──
 
-    public void GuardarVehiculos()
+    private CsvConfiguration Config => new CsvConfiguration(CultureInfo.InvariantCulture)
     {
-        using (var writer = new StreamWriter("vehiculos.csv"))
-        using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-        {
-            csv.WriteRecords(Vehiculos);
-        }
-    }
-    public void CargarVehiculos()
-    {
-        if (!File.Exists("vehiculos.csv")) return;
+        // Convierte todo a minúsculas antes de comparar, así 'Id' coincide con 'id'
+        PrepareHeaderForMatch = args => args.Header.ToLower(),
+        HeaderValidated = null, // Evita errores si falta alguna columna
+        MissingFieldFound = null // Evita errores si hay campos vacíos
+    };
 
-        using (var reader = new StreamReader("vehiculos.csv"))
-        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-        {
-            Vehiculos.Clear();
-            // Leemos como Carro (o la clase que estés usando para el mapeo)
-            var registros = csv.GetRecords<Carro>().ToList();
-            Vehiculos.AddRange(registros);
-        }
+    public void GuardarVehiculos()
+{
+    using (var writer = new StreamWriter(_rutaArchivo))
+    // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
+    using (var csv = new CsvWriter(writer, Config)) 
+    {
+        csv.WriteRecords(Vehiculos);
     }
+}
+    public void CargarVehiculos()
+{
+    if (!File.Exists(_rutaArchivo)) return;
+
+    using (var reader = new StreamReader(_rutaArchivo))
+    // CAMBIO: Usa 'Config' en lugar de 'CultureInfo.InvariantCulture'
+    using (var csv = new CsvReader(reader, Config)) 
+    {
+        Vehiculos.Clear();
+        // Cargamos como Carro (esto funcionará para ambos si tienen los mismos campos)
+        var registros = csv.GetRecords<Carro>().Cast<Vehiculo>().ToList();
+        Vehiculos.AddRange(registros);
+    }
+}
 }
