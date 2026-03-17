@@ -3,25 +3,37 @@ namespace ConsoleApp;
 
 public static class UIUsuarios
 {
-    private static readonly string rutaClientes = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "clientes.csv");
-    private static readonly PersistenciaCsv<Cliente> persistencia = new PersistenciaCsv<Cliente>();
-    private static List<Cliente> _clientes = persistencia.Cargar(rutaClientes);
+    private static List<Cliente> _clientes = new List<Cliente>();
+    private static readonly string _rutaClientes = "clientes.csv";
+
+    static UIUsuarios()
+    {
+        CargarClientes();
+    }
+
+    // Expuesto para que UIVentas pueda buscar clientes por cédula
+    public static List<Cliente> GetClientes() => _clientes;
+
     public static void SubmenuClientes()
     {
-        string menu = """
-        === SUBMENÚ CLIENTES ===
+        string menuClientes = """
+        -------------------------------
         1. Crear Cliente
         2. Listar Clientes
         3. Actualizar Cliente
         4. Eliminar Cliente
         5. Volver
+        -------------------------------
+        Ingrese una opción: 
         """;
 
-        while (true)
+        do
         {
-            Console.WriteLine(menu);
-            string opcion = Console.ReadLine()!;
-            switch (opcion)
+            Console.Clear();
+            Console.Write(menuClientes);
+            string? entrada = Console.ReadLine();
+
+            switch (entrada)
             {
                 case "1": CrearCliente(); break;
                 case "2": ListarClientes(); break;
@@ -30,48 +42,82 @@ public static class UIUsuarios
                 case "5": return;
                 default: Console.WriteLine("Opción inválida."); break;
             }
-        }
+
+            Console.WriteLine("\nPresione una tecla para continuar...");
+            Console.ReadKey();
+
+        } while (true);
     }
 
     static void CrearCliente()
     {
-        Console.Write("Cédula: "); long cedula = long.Parse(Console.ReadLine()!);
+        Console.WriteLine("=== CREAR CLIENTE ===");
+        Console.Write("Cédula: "); int cedula = int.Parse(Console.ReadLine()!);
         Console.Write("Nombre: "); string nombre = Console.ReadLine()!;
         Console.Write("Teléfono: "); string telefono = Console.ReadLine()!;
         Console.Write("Dirección: "); string direccion = Console.ReadLine()!;
 
-        _clientes.Add(new Cliente { Cedula = cedula, Nombre = nombre, Telefono = telefono, Direccion = direccion });
-        persistencia.Guardar(_clientes, rutaClientes);
+        _clientes.Add(new Cliente(cedula, nombre, telefono, direccion));
+        GuardarClientes();
+        Console.WriteLine("\nCliente registrado con éxito.");
     }
 
     static void ListarClientes()
     {
-        if (_clientes.Count == 0) { Console.WriteLine("No hay clientes."); return; }
+        Console.WriteLine("=== LISTA DE CLIENTES ===");
+        if (_clientes.Count == 0) { Console.WriteLine("No hay clientes registrados."); return; }
         foreach (var c in _clientes)
-            Console.WriteLine($"{c.Cedula} - {c.Nombre} | Tel: {c.Telefono} | Dir: {c.Direccion}");
+            Console.WriteLine($"Cédula: {c.Cedula}, Nombre: {c.Nombre}, Teléfono: {c.Telefono}, Dirección: {c.Direccion}");
     }
 
     static void ActualizarCliente()
     {
-        Console.Write("Cédula: "); int cedula = int.Parse(Console.ReadLine()!);
+        Console.WriteLine("=== ACTUALIZAR CLIENTE ===");
+        Console.Write("Ingrese la cédula: "); int cedula = int.Parse(Console.ReadLine()!);
         var cliente = _clientes.FirstOrDefault(c => c.Cedula == cedula);
-        if (cliente == null) { Console.WriteLine("No encontrado."); return; }
+        if (cliente == null) { Console.WriteLine("Cliente no encontrado."); return; }
 
         Console.Write("Nuevo nombre: "); cliente.Nombre = Console.ReadLine()!;
         Console.Write("Nuevo teléfono: "); cliente.Telefono = Console.ReadLine()!;
         Console.Write("Nueva dirección: "); cliente.Direccion = Console.ReadLine()!;
-        persistencia.Guardar(_clientes, rutaClientes);
+        GuardarClientes();
+        Console.WriteLine("Cliente actualizado con éxito.");
     }
 
     static void EliminarCliente()
     {
-        Console.Write("Cédula: "); int cedula = int.Parse(Console.ReadLine()!);
+        Console.WriteLine("=== ELIMINAR CLIENTE ===");
+        Console.Write("Ingrese la cédula: "); int cedula = int.Parse(Console.ReadLine()!);
         var cliente = _clientes.FirstOrDefault(c => c.Cedula == cedula);
-        if (cliente == null) { Console.WriteLine("No encontrado."); return; }
+        if (cliente == null) { Console.WriteLine("Cliente no encontrado."); return; }
         _clientes.Remove(cliente);
-        persistencia.Guardar(_clientes, rutaClientes);
+        GuardarClientes();
+        Console.WriteLine("Cliente eliminado con éxito.");
     }
 
-    public static List<Cliente> GetClientes() => _clientes;
+    // ── Persistencia CSV ──────────────────────────────────────────────────────
 
+    static void GuardarClientes()
+    {
+        using StreamWriter w = new StreamWriter(_rutaClientes, append: false);
+        w.WriteLine("Cedula,Nombre,Telefono,Direccion");
+        foreach (var c in _clientes)
+            w.WriteLine($"{c.Cedula},{c.Nombre},{c.Telefono},{c.Direccion}");
+    }
+
+    static void CargarClientes()
+    {
+        if (!File.Exists(_rutaClientes)) return;
+
+        using StreamReader r = new StreamReader(_rutaClientes);
+        r.ReadLine(); // encabezado
+        while (!r.EndOfStream)
+        {
+            string? linea = r.ReadLine();
+            if (string.IsNullOrWhiteSpace(linea)) continue;
+            string[] d = linea.Split(',');
+            if (d.Length < 4) continue;
+            _clientes.Add(new Cliente(int.Parse(d[0]), d[1], d[2], d[3]));
+        }
+    }
 }

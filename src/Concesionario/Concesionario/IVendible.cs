@@ -1,6 +1,5 @@
 public interface IVendible
 {
-    public bool Vendido { get; set; }
-    public decimal CalcularPrecioFinal();
-
+    bool Vendido { get; set; }
+    void Vender();
 }

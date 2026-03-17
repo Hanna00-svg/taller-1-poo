@@ -1,21 +1,24 @@
 public class Moto : Vehiculo
 {
-    public Moto(long id, string marca, string modelo, string color, string placa, decimal precio, int cilindraje, bool vendido = false)
-        : base(id, marca, modelo, color, placa, precio, cilindraje, vendido , tipo: "Moto")
+    public Moto(int id, string marca, string modelo, string color, string placa, int cilindraje, decimal precio)
+        : base(id, marca, modelo, color, placa, cilindraje, precio)
     {
     }
 
     public override decimal CalcularPrecioFinal()
     {
-        decimal iva = 0m;
+        decimal iva = 0;
+        if (Cilindraje >= 100 && Cilindraje <= 300)
+            iva = 0.10m;
+        else if (Cilindraje > 300 && Cilindraje <= 1000)
+            iva = 0.20m;
 
-        if (Cilindraje <= 250)
-            iva = 0.03m;
-        else if (Cilindraje <= 600)
-            iva = 0.05m;
-        else
-            iva = 0.12m;
+        return Precio + (Precio * iva);
+    }
 
-        return Precio * (1 + iva);
+    public override string ToCsv()
+    {
+        // Prefijo "Moto" para poder reconstruir el tipo correcto al cargar
+        return $"Moto,{base.ToCsv()}";
     }
 }
