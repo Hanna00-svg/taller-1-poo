@@ -4,7 +4,7 @@ using CsvHelper.Configuration;
 
 public interface IPersistible<T>
 {
-    void Guardar(List<T> elementos, string rutaArchivo);
+    public void Guardar(List<T> elementos, string rutaArchivo);
     List<T> Cargar(string rutaArchivo);
 }
 

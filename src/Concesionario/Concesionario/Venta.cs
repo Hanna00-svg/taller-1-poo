@@ -4,7 +4,7 @@ public class Venta
     public DateTime Fecha { get; set; }
     public Cliente Cliente { get; set; }
     public List<Vehiculo> Vehiculos { get; set; }
-    public Factura? Factura { get; set; }
+    public Factura Factura { get; set; }
 
     public void GenerarFactura()
     {
