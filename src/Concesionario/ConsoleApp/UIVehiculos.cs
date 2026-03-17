@@ -86,13 +86,9 @@ public static class UIVehiculos
         Vehiculo v;
 
         if (r.Tipo == "Carro")
-        {
             v = new Carro(r.Id, r.Marca, r.Modelo, r.Color, r.Placa, r.Precio, r.Cilindraje, r.Vendido);
-        }
         else
-        {
             v = new Moto(r.Id, r.Marca, r.Modelo, r.Color, r.Placa, r.Precio, r.Cilindraje, r.Vendido);
-        }
 
         v.Tipo = r.Tipo;
         lista.Add(v);

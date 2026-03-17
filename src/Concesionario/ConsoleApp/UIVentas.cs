@@ -3,8 +3,7 @@ namespace ConsoleApp;
 public static class UIVentas
 {
     private static readonly string rutaVentas = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ventas.csv");
-    private static readonly PersistenciaCsv<Venta> persistencia = new PersistenciaCsv<Venta>();
-    private static List<Venta> _ventas = persistencia.Cargar(rutaVentas);
+    private static List<Venta> _ventas = CargarVentas();
 
     public static void SubmenuVentas()
     {
@@ -48,7 +47,7 @@ public static class UIVentas
         var venta = new Venta { Id = id, Fecha = DateTime.Now, Cliente = cliente, Vehiculos = new List<Vehiculo> { vehiculo } };
         venta.GenerarFactura();
         _ventas.Add(venta);
-        persistencia.Guardar(_ventas, rutaVentas);
+        GuardarVentas();
 
         Console.WriteLine($"Venta creada. Total: {venta.Factura?.Total}");
     }
@@ -80,9 +79,67 @@ public static class UIVentas
         var venta = _ventas.FirstOrDefault(v => v.Id == id);
         if (venta == null) { Console.WriteLine("Venta no encontrada."); return; }
         _ventas.Remove(venta);
-        persistencia.Guardar(_ventas, rutaVentas);
+        GuardarVentas();
         Console.WriteLine("Venta eliminada.");
     }
+
+    private static List<Venta> CargarVentas()
+    {
+        var lista = new List<Venta>();
+
+        if (!File.Exists(rutaVentas)) return lista;
+
+        var lineas = File.ReadAllLines(rutaVentas).Skip(1);
+
+        foreach (var linea in lineas)
+        {
+            var datos = linea.Split(',');
+
+            long id = long.Parse(datos[0]);
+            DateTime fecha = DateTime.Parse(datos[1]);
+            long cedula = long.Parse(datos[2]);
+
+            var idsVehiculos = datos[3].Split('|').Select(long.Parse).ToList();
+
+            var cliente = UIUsuarios.GetClientes().FirstOrDefault(c => c.Cedula == cedula);
+
+            var vehiculos = UIVehiculos.GetVehiculos().Where(v => idsVehiculos.Contains(v.Id)).ToList();
+
+            if (cliente == null) continue;
+
+            var venta = new Venta
+            {
+            Id = id,
+            Fecha = fecha,
+            Cliente = cliente,
+            Vehiculos = vehiculos
+            };
+
+            venta.GenerarFactura();
+
+            lista.Add(venta);
+        }
+
+        return lista;
+    }
+    private static void GuardarVentas()
+    {
+        var lineas = new List<string>
+        {
+            "Id,Fecha,CedulaCliente,IdsVehiculos,Total"
+        };
+
+        foreach (var v in _ventas)
+        {
+            string idsVehiculos = string.Join("|", v.Vehiculos.Select(x => x.Id));
+
+            string linea = $"{v.Id},{v.Fecha},{v.Cliente.Cedula},{idsVehiculos},{v.Factura?.Total}";
+            lineas.Add(linea);
+        }
+
+        File.WriteAllLines(rutaVentas, lineas);
+    }
+
 
     // Método auxiliar
     public static List<Venta> GetVentas() => _ventas;
