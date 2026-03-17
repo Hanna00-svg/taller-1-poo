@@ -16,12 +16,12 @@ public class PersistenciaCsv<T> : IPersistible<T>
         HeaderValidated = null,
         MissingFieldFound = null
     };
-public void Guardar(List<T> elementos, string rutaArchivo)
-    {
-        using var writer = new StreamWriter(rutaArchivo);
-        using var csv = new CsvWriter(writer, Config);
-        csv.WriteRecords(elementos);
-    }
+    public void Guardar(List<T> elementos, string rutaArchivo)
+        {
+            using var writer = new StreamWriter(rutaArchivo);
+            using var csv = new CsvWriter(writer, Config);
+            csv.WriteRecords(elementos);
+        }
 
     public List<T> Cargar(string rutaArchivo)
     {
