@@ -9,8 +9,9 @@ public abstract class Vehiculo : IVendible
     public decimal Precio { get; set; }
     public int Cilindraje { get; set; }
     public bool Vendido { get; set; }
+    public string Tipo { get; set; }
 
-    public Vehiculo(long id, string marca, string modelo, string color, string placa, decimal precio, int cilindraje, bool vendido = false)
+    public Vehiculo(long id, string marca, string modelo, string color, string placa, decimal precio, int cilindraje, bool vendido = false, string tipo = "")
     {
         Id = id;
         Marca = marca;
@@ -20,6 +21,7 @@ public abstract class Vehiculo : IVendible
         Precio = precio;
         Cilindraje = cilindraje;
         Vendido = vendido;
+        Tipo = tipo;
     }
 
     public abstract decimal CalcularPrecioFinal();

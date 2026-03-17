@@ -5,7 +5,7 @@ public static class UIVehiculos
 {
     private static readonly string rutaVehiculos = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vehiculos.csv");
     private static readonly PersistenciaCsv<Vehiculo> persistencia = new PersistenciaCsv<Vehiculo>();
-    private static List<Vehiculo> _vehiculos = persistencia.Cargar(rutaVehiculos);
+    private static List<Vehiculo> _vehiculos = CargarVehiculos();
 
     public static void SubmenuVehiculos()
     {
@@ -44,10 +44,18 @@ public static class UIVehiculos
 
         Console.Write("Tipo (1=Carro, 2=Moto): ");
         string tipo = Console.ReadLine()!;
-        Vehiculo v = tipo == "1"
-            ? new Carro(id, marca, modelo, color, placa, precio, cilindraje)
-            : new Moto(id, marca, modelo, color, placa, precio, cilindraje);
+        Vehiculo v;
 
+        if (tipo == "1")
+        {
+            v = new Carro(id, marca, modelo, color, placa, precio, cilindraje);
+            v.Tipo = "Carro";
+        }
+        else
+        {
+            v = new Moto(id, marca, modelo, color, placa, precio, cilindraje);
+            v.Tipo = "Moto";
+        }
         _vehiculos.Add(v);
         persistencia.Guardar(_vehiculos, rutaVehiculos);
     }
@@ -67,6 +75,31 @@ public static class UIVehiculos
         _vehiculos.Remove(vehiculo);
         persistencia.Guardar(_vehiculos, rutaVehiculos);
     }
+
+    private static List<Vehiculo> CargarVehiculos()
+{
+    var registros = persistencia.Cargar(rutaVehiculos);
+    var lista = new List<Vehiculo>();
+
+    foreach (var r in registros)
+    {
+        Vehiculo v;
+
+        if (r.Tipo == "Carro")
+        {
+            v = new Carro(r.Id, r.Marca, r.Modelo, r.Color, r.Placa, r.Precio, r.Cilindraje, r.Vendido);
+        }
+        else
+        {
+            v = new Moto(r.Id, r.Marca, r.Modelo, r.Color, r.Placa, r.Precio, r.Cilindraje, r.Vendido);
+        }
+
+        v.Tipo = r.Tipo;
+        lista.Add(v);
+    }
+
+    return lista;
+}
 
     // Método auxiliar
     public static List<Vehiculo> GetVehiculos() => _vehiculos;
