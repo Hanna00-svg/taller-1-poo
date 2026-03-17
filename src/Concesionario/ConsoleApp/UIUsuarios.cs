@@ -3,8 +3,8 @@ namespace ConsoleApp;
 
 public static class UIUsuarios
 {
-    private static List<Cliente> _clientes = new List<Cliente>();
-    private static readonly string _rutaClientes = "clientes.csv";
+    private static List<Cliente> _clientes = new List<Cliente>(); // Almacena los clientes en memoria
+    private static readonly string _rutaClientes = "clientes.csv"; //Define la ruta
 
     static UIUsuarios()
     {
@@ -99,7 +99,7 @@ public static class UIUsuarios
 
     static void GuardarClientes()
     {
-        using StreamWriter w = new StreamWriter(_rutaClientes, append: false);
+        using StreamWriter w = new StreamWriter(_rutaClientes, append: false); // abre el archivo para sobrescribir, no agrega al final
         w.WriteLine("Cedula,Nombre,Telefono,Direccion");
         foreach (var c in _clientes)
             w.WriteLine($"{c.Cedula},{c.Nombre},{c.Telefono},{c.Direccion}");
@@ -107,7 +107,7 @@ public static class UIUsuarios
 
     static void CargarClientes()
     {
-        if (!File.Exists(_rutaClientes)) return;
+        if (!File.Exists(_rutaClientes)) return; //si el archivo no existe, no hay nada que cargar
 
         using StreamReader r = new StreamReader(_rutaClientes);
         r.ReadLine(); // encabezado
@@ -116,8 +116,8 @@ public static class UIUsuarios
             string? linea = r.ReadLine();
             if (string.IsNullOrWhiteSpace(linea)) continue;
             string[] d = linea.Split(',');
-            if (d.Length < 4) continue;
-            _clientes.Add(new Cliente(int.Parse(d[0]), d[1], d[2], d[3]));
+            if (d.Length < 4) continue; // si no tiene 4 columnas se descarta
+            _clientes.Add(new Cliente(int.Parse(d[0]), d[1], d[2], d[3])); // Se crea nuevo cliente con los datos leidos
         }
     }
 }
