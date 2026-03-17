@@ -34,7 +34,7 @@ public static class UIVehiculos
 
     static void AgregarVehiculo()
     {
-        Console.Write("Id: "); int id = int.Parse(Console.ReadLine()!);
+        Console.Write("Id: "); long id = long.Parse(Console.ReadLine()!);
         Console.Write("Marca: "); string marca = Console.ReadLine()!;
         Console.Write("Modelo: "); string modelo = Console.ReadLine()!;
         Console.Write("Color: "); string color = Console.ReadLine()!;
@@ -61,7 +61,7 @@ public static class UIVehiculos
 
     static void EliminarVehiculo()
     {
-        Console.Write("Id: "); int id = int.Parse(Console.ReadLine()!);
+        Console.Write("Id: "); long id = long.Parse(Console.ReadLine()!);
         var vehiculo = _vehiculos.FirstOrDefault(v => v.Id == id);
         if (vehiculo == null) { Console.WriteLine("No encontrado."); return; }
         _vehiculos.Remove(vehiculo);

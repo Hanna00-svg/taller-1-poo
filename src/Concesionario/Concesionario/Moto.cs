@@ -1,6 +1,6 @@
 public class Moto : Vehiculo
 {
-    public Moto(int id, string marca, string modelo, string color, string placa, decimal precio, int cilindraje, bool vendido = false)
+    public Moto(long id, string marca, string modelo, string color, string placa, decimal precio, int cilindraje, bool vendido = false)
         : base(id, marca, modelo, color, placa, precio, cilindraje, vendido)
     {
     }

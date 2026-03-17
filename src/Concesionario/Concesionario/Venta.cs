@@ -1,6 +1,6 @@
 public class Venta
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     public DateTime Fecha { get; set; }
     public Cliente Cliente { get; set; }
     public List<Vehiculo> Vehiculos { get; set; }

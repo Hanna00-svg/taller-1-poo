@@ -35,7 +35,7 @@ public static class UIUsuarios
 
     static void CrearCliente()
     {
-        Console.Write("Cédula: "); int cedula = int.Parse(Console.ReadLine()!);
+        Console.Write("Cédula: "); long cedula = long.Parse(Console.ReadLine()!);
         Console.Write("Nombre: "); string nombre = Console.ReadLine()!;
         Console.Write("Teléfono: "); string telefono = Console.ReadLine()!;
         Console.Write("Dirección: "); string direccion = Console.ReadLine()!;

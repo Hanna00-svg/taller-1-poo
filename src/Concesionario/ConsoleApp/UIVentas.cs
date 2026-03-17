@@ -35,13 +35,13 @@ public static class UIVentas
 
     static void CrearVenta()
     {
-        Console.Write("Id Venta: "); int id = int.Parse(Console.ReadLine()!);
-        Console.Write("Cédula Cliente: "); int cedula = int.Parse(Console.ReadLine()!);
+        Console.Write("Id Venta: "); long id = long.Parse(Console.ReadLine()!);
+        Console.Write("Cédula Cliente: "); long cedula = long.Parse(Console.ReadLine()!);
 
         var cliente = UIUsuarios.GetClientes().FirstOrDefault(c => c.Cedula == cedula);
         if (cliente == null) { Console.WriteLine("Cliente no encontrado."); return; }
 
-        Console.Write("Id Vehículo: "); int idVehiculo = int.Parse(Console.ReadLine()!);
+        Console.Write("Id Vehículo: "); long idVehiculo = long.Parse(Console.ReadLine()!);
         var vehiculo = UIVehiculos.GetVehiculos().FirstOrDefault(v => v.Id == idVehiculo && !v.Vendido);
         if (vehiculo == null) { Console.WriteLine("Vehículo no disponible."); return; }
 
